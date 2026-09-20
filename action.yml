@@ -13,6 +13,10 @@ inputs:
     required: false
     type: string
     default: "true"
+  install_poetry_groups:
+    required: false
+    type: string
+    default: ""
   system_packages:
     required: false
     type: string
@@ -46,13 +50,13 @@ runs:
     - name: Install Poetry
       shell: bash
       run: pipx install Poetry
-      if: inputs.install_dependencies == 'true' || inputs.install_test_dependencies == 'true'
+      if: inputs.install_dependencies == 'true' || inputs.install_test_dependencies == 'true' || inputs.install_poetry_groups != ''
 
     - name: Install Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ steps.setup.outputs.python_version }}
-        cache: ${{ inputs.install_dependencies == 'true' && 'poetry' || 'pip' }}
+        cache: ${{ inputs.install_dependencies == 'true' || inputs.install_test_dependencies == 'true' || inputs.install_poetry_groups != '' && 'poetry' || 'pip' }}
 
     - name: Install tox
       shell: bash
@@ -61,5 +65,23 @@ runs:
 
     - name: Install python dependencies
       shell: bash
-      run: poetry install ${{ inputs.install_dependencies == 'true' && '--only=main' || '' }} ${{ inputs.install_test_dependencies == 'true' && '--only=test' || '' }}
-      if: inputs.install_dependencies == 'true' || inputs.install_test_dependencies == 'true'
+      run: |
+        poetry_args=()
+        if [ "${{ inputs.install_dependencies }}" == "true" ];
+        then
+          poetry_args+=("--only=main")
+        fi
+        if [ "${{ inputs.install_test_dependencies }}" == "true" ];
+        then
+          poetry_args+=("--only=test")
+        fi
+        poetry_groups=$(tr "," " " <<< "${{ inputs.install_poetry_groups }}")
+        if [ -n "$poetry_groups}" ];
+        then
+          for group in ${poetry_groups};
+          do
+            poetry_args+=("--only=${group}")
+          done
+        fi
+        poetry install "${poetry_args[@]}"
+      if: inputs.install_dependencies == 'true' || inputs.install_test_dependencies == 'true' || inputs.install_poetry_groups != ''
