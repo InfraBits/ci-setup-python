@@ -76,7 +76,7 @@ runs:
           poetry_args+=("--only=test")
         fi
         poetry_groups=$(tr "," " " <<< "${{ inputs.install_poetry_groups }}")
-        if [ -n "$poetry_groups}" ];
+        if [ -n "$poetry_groups" ];
         then
           for group in ${poetry_groups};
           do
