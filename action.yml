@@ -56,7 +56,7 @@ runs:
       uses: actions/setup-python@v7
       with:
         python-version: ${{ steps.setup.outputs.python_version }}
-        cache: ${{ inputs.install_dependencies == 'true' || inputs.install_test_dependencies == 'true' || inputs.install_poetry_groups != '' && 'poetry' || 'pip' }}
+        cache: ${{ (inputs.install_dependencies == 'true' || inputs.install_test_dependencies == 'true' || inputs.install_poetry_groups != '') && 'poetry' || 'pip' }}
 
     - name: Install tox
       shell: bash
