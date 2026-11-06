@@ -53,7 +53,7 @@ runs:
       if: inputs.install_dependencies == 'true' || inputs.install_test_dependencies == 'true' || inputs.install_poetry_groups != ''
 
     - name: Install Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
       with:
         python-version: ${{ steps.setup.outputs.python_version }}
         cache: ${{ (inputs.install_dependencies == 'true' || inputs.install_test_dependencies == 'true' || inputs.install_poetry_groups != '') && 'poetry' || 'pip' }}
